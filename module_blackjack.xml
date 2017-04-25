@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_blackjack" default="compile.module.blackjack">
+  <dirname property="module.blackjack.basedir" file="${ant.file.module_blackjack}"/>
+  
+  <property name="module.jdk.home.blackjack" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.blackjack" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.blackjack" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.blackjack" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="blackjack.output.dir" value="${module.blackjack.basedir}/out/production/Blackjack"/>
+  <property name="blackjack.testoutput.dir" value="${module.blackjack.basedir}/out/test/Blackjack"/>
+  
+  <path id="blackjack.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="blackjack.module.production.classpath">
+    <path refid="${module.jdk.classpath.blackjack}"/>
+  </path>
+  
+  <path id="blackjack.runtime.production.module.classpath">
+    <pathelement location="${blackjack.output.dir}"/>
+  </path>
+  
+  <path id="blackjack.module.classpath">
+    <path refid="${module.jdk.classpath.blackjack}"/>
+    <pathelement location="${blackjack.output.dir}"/>
+  </path>
+  
+  <path id="blackjack.runtime.module.classpath">
+    <pathelement location="${blackjack.testoutput.dir}"/>
+    <pathelement location="${blackjack.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.blackjack">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.blackjack">
+    <patternset refid="excluded.from.module.blackjack"/>
+  </patternset>
+  
+  <path id="blackjack.module.sourcepath">
+    <dirset dir="${module.blackjack.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.blackjack" depends="compile.module.blackjack.production,compile.module.blackjack.tests" description="Compile module Blackjack"/>
+  
+  <target name="compile.module.blackjack.production" depends="register.custom.compilers" description="Compile module Blackjack; production classes">
+    <mkdir dir="${blackjack.output.dir}"/>
+    <javac2 destdir="${blackjack.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.blackjack}/javac">
+      <compilerarg line="${compiler.args.blackjack}"/>
+      <bootclasspath refid="blackjack.module.bootclasspath"/>
+      <classpath refid="blackjack.module.production.classpath"/>
+      <src refid="blackjack.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.blackjack"/>
+    </javac2>
+    
+    <copy todir="${blackjack.output.dir}">
+      <fileset dir="${module.blackjack.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.blackjack.tests" depends="register.custom.compilers,compile.module.blackjack.production" description="compile module Blackjack; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.blackjack" description="cleanup module">
+    <delete dir="${blackjack.output.dir}"/>
+    <delete dir="${blackjack.testoutput.dir}"/>
+  </target>
+</project>
